@@ -3,6 +3,13 @@ package com.city.datadelivery;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.city.datadelivery.base.DeliveryManager;
+import com.city.datadelivery.base.Message;
+import com.city.datadelivery.base.MessageQueue;
+import com.city.datadelivery.base.consumer.MessageConsumer;
+import com.city.datadelivery.base.producer.MessageProducer;
+import com.city.datadelivery.base.producer.MessageProducerTask;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -10,13 +17,13 @@ public class Main {
 		MessageQueue messageQueue = new MessageQueue();
 
 		DeliveryManager deliveryManager = new DeliveryManager(messageQueue, executorService);
-		deliveryManager.addMessageProcessor(new MessageProcessor() {
+		deliveryManager.addMessageConsumer(new MessageConsumer() {
 			@Override
 			public void processMessage(Message message) {
 				System.out.println("Processor 1: " + message.getBody());
 			}
 		});
-		deliveryManager.addMessageProcessor(new MessageProcessor() {
+		deliveryManager.addMessageConsumer(new MessageConsumer() {
 			@Override
 			public void processMessage(Message message) {
 				System.out.println("Processor 2: " + message.getBody());

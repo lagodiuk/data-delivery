@@ -1,4 +1,4 @@
-package com.city.datadelivery;
+package com.city.datadelivery.base;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,8 +15,7 @@ public class MessageQueue {
 			Message message = this.messageQueue.take();
 			return message;
 		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+			throw new MessageQueueException("Interrupted while waiting for new messages");
 		}
 	}
-
 }
