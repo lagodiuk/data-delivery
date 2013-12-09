@@ -2,13 +2,48 @@ package com.city.datadelivery.base;
 
 public final class Message {
 
-	private final String body;
+	private final String id;
 
-	public Message(String body) {
-		this.body = body;
+	private final String name;
+
+	private final Integer age;
+
+	private final String address;
+
+	private final String city;
+
+	private final String postalCode;
+
+	public Message(String id, String name, Integer age, String address, String city, String postalCode) {
+		this.id = id;
+		this.name = name;
+		this.age = age;
+		this.address = address;
+		this.city = city;
+		this.postalCode = postalCode;
 	}
 
-	public String getBody() {
-		return this.body;
+	public String getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public Integer getAge() {
+		return this.age;
+	}
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public String getCity() {
+		return this.city;
+	}
+
+	public String getPostalCode() {
+		return this.postalCode;
 	}
 }
