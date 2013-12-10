@@ -13,10 +13,12 @@ import com.city.datadelivery.base.producer.MessageProducer;
 
 public class ReadingFileProducer implements MessageProducer {
 
-	private static final String DELIMITER_REGEXP = "\\|";
-
 	private static final Logger LOGGER =
 			Logger.getLogger(ReadingFileProducer.class.getName());
+
+	private static final String DELIMITER_REGEXP = "\\|";
+
+	private volatile boolean isFinished = false;
 
 	private String fileName;
 
@@ -54,6 +56,8 @@ public class ReadingFileProducer implements MessageProducer {
 			LOGGER.log(
 					Level.WARNING,
 					"Error while closing file " + this.fileName);
+		} finally {
+			this.isFinished = true;
 		}
 	}
 
@@ -69,5 +73,10 @@ public class ReadingFileProducer implements MessageProducer {
 						.withPostalCode(parts[5]);
 
 		return messageBuilder.createMessage();
+	}
+
+	@Override
+	public boolean isFinished() {
+		return this.isFinished;
 	}
 }
