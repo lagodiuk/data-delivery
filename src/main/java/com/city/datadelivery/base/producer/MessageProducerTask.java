@@ -20,5 +20,6 @@ public class MessageProducerTask implements Runnable {
 			Message message = this.messageProducer.nextMessage();
 			this.messageQueue.addMessage(message);
 		}
+		this.messageProducer.cleanUp();
 	}
 }

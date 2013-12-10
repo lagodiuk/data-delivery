@@ -28,6 +28,13 @@ public class MessageBuilder {
 		return this;
 	}
 
+	public MessageBuilder withAge(String ageStr) {
+		if ((ageStr != null) && (ageStr.matches("\\d+"))) {
+			this.age = Integer.parseInt(ageStr);
+		}
+		return this;
+	}
+
 	public MessageBuilder withAddress(String address) {
 		this.address = address;
 		return this;
