@@ -11,12 +11,12 @@ import com.city.datadelivery.base.Message;
 import com.city.datadelivery.base.MessageBuilder;
 import com.city.datadelivery.base.producer.MessageProducer;
 
-public class ReadingFileMessageProducer implements MessageProducer {
+public class ReadingFileProducer implements MessageProducer {
 
 	private static final String DELIMITER_REGEXP = "\\|";
 
 	private static final Logger LOGGER =
-			Logger.getLogger(ReadingFileMessageProducer.class.getName());
+			Logger.getLogger(ReadingFileProducer.class.getName());
 
 	private String fileName;
 
@@ -24,7 +24,7 @@ public class ReadingFileMessageProducer implements MessageProducer {
 
 	private String nextLine;
 
-	public ReadingFileMessageProducer(String fileName) throws FileNotFoundException {
+	public ReadingFileProducer(String fileName) throws FileNotFoundException {
 		this.reader = new BufferedReader(new FileReader(fileName));
 		this.fileName = fileName;
 	}

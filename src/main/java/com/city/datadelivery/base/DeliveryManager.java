@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 
 import com.city.datadelivery.base.consumer.MessageConsumer;
 import com.city.datadelivery.base.consumer.MessageConsumerTask;
+import com.city.datadelivery.base.producer.MessageProducer;
+import com.city.datadelivery.base.producer.MessageProducerTask;
 
 public class DeliveryManager implements Runnable {
 
@@ -33,5 +35,14 @@ public class DeliveryManager implements Runnable {
 
 	public void addMessageConsumer(MessageConsumer messageProcessor) {
 		this.messageConsumers.add(messageProcessor);
+	}
+
+	public void addMessageProducer(MessageProducer messageProducer) {
+		MessageProducerTask task = new MessageProducerTask(this.messageQueue, messageProducer);
+		this.executorService.submit(task);
+	}
+
+	public void start() {
+		this.executorService.submit(this);
 	}
 }
