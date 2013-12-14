@@ -15,17 +15,7 @@ public class MessageQueue {
 		return message;
 	}
 
-	public void waitUntilQueueIsEmpty() throws InterruptedException {
-		synchronized (this) {
-			this.wait();
-		}
-	}
-
-	public void notifyWaitersIfQueueIsEmpty() {
-		if (this.messageQueue.isEmpty()) {
-			synchronized (this) {
-				this.notifyAll();
-			}
-		}
+	public boolean isEmpty() {
+		return this.messageQueue.isEmpty();
 	}
 }

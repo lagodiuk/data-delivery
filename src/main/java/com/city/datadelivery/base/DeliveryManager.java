@@ -22,6 +22,8 @@ public class DeliveryManager implements Runnable {
 
 	private MessageQueue messageQueue;
 
+	private Thread deliveryThread;
+
 	public DeliveryManager(
 			MessageQueue messageQueue,
 			ExecutorService producersExecutor,
@@ -32,18 +34,13 @@ public class DeliveryManager implements Runnable {
 		this.consumersExecutor = consumersExecutor;
 	}
 
-	public void performDelivery() throws InterruptedException {
-		// Start messages dispatching process
-		Thread deliveryThread = new Thread(this);
-		deliveryThread.start();
+	public void forkDeliveryThread() throws InterruptedException {
+		this.deliveryThread = new Thread(this);
+		this.deliveryThread.start();
+	}
 
-		this.waitUntillAllProducersAreStopped();
-
-		this.messageQueue.waitUntilQueueIsEmpty();
-		// Stop messages dispatching process
-		deliveryThread.interrupt();
-
-		this.waitUntilAllConsumersAreStopped();
+	public void interruptDeliveryThread() {
+		this.deliveryThread.interrupt();
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class DeliveryManager implements Runnable {
 
 			this.forkAllConsumers(message);
 
-			this.messageQueue.notifyWaitersIfQueueIsEmpty();
+			this.notifyWaitersIfQueueIsEmpty();
 		}
 	}
 
@@ -83,13 +80,27 @@ public class DeliveryManager implements Runnable {
 		}
 	}
 
-	private void waitUntilAllConsumersAreStopped() throws InterruptedException {
+	public void waitUntilAllConsumersAreStopped() throws InterruptedException {
 		this.consumersExecutor.shutdown();
 		this.consumersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
 	}
 
-	private void waitUntillAllProducersAreStopped() throws InterruptedException {
+	public void waitUntillAllProducersAreStopped() throws InterruptedException {
 		this.producersExecutor.shutdown();
 		this.producersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
+	}
+
+	public void waitUntilQueueIsEmpty() throws InterruptedException {
+		synchronized (this) {
+			this.wait();
+		}
+	}
+
+	private void notifyWaitersIfQueueIsEmpty() {
+		if (this.messageQueue.isEmpty()) {
+			synchronized (this) {
+				this.notifyAll();
+			}
+		}
 	}
 }
