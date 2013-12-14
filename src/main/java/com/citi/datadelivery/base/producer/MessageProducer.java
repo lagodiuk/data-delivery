@@ -1,6 +1,6 @@
-package com.city.datadelivery.base.producer;
+package com.citi.datadelivery.base.producer;
 
-import com.city.datadelivery.base.Message;
+import com.citi.datadelivery.base.Message;
 
 public interface MessageProducer {
 

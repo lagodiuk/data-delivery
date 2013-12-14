@@ -1,4 +1,4 @@
-package com.city.datadelivery;
+package com.citi.datadelivery;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.city.datadelivery.base.Message;
-import com.city.datadelivery.base.MessageBuilder;
-import com.city.datadelivery.base.producer.MessageProducer;
+import com.citi.datadelivery.base.Message;
+import com.citi.datadelivery.base.MessageBuilder;
+import com.citi.datadelivery.base.producer.MessageProducer;
 
 public class ReadingFileProducer implements MessageProducer {
 

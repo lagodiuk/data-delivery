@@ -1,14 +1,14 @@
-package com.city.datadelivery.base;
+package com.citi.datadelivery.base;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.city.datadelivery.base.consumer.MessageConsumer;
-import com.city.datadelivery.base.consumer.MessageConsumerTask;
-import com.city.datadelivery.base.producer.MessageProducer;
-import com.city.datadelivery.base.producer.MessageProducerTask;
+import com.citi.datadelivery.base.consumer.MessageConsumer;
+import com.citi.datadelivery.base.consumer.MessageConsumerTask;
+import com.citi.datadelivery.base.producer.MessageProducer;
+import com.citi.datadelivery.base.producer.MessageProducerTask;
 
 public class DeliveryManager implements Runnable {
 

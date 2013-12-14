@@ -1,9 +1,9 @@
-package com.city.datadelivery;
+package com.citi.datadelivery;
 
 import java.util.concurrent.Executors;
 
-import com.city.datadelivery.base.DeliveryManager;
-import com.city.datadelivery.base.MessageQueue;
+import com.citi.datadelivery.base.DeliveryManager;
+import com.citi.datadelivery.base.MessageQueue;
 
 public class Main {
 

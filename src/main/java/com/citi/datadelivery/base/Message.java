@@ -1,4 +1,4 @@
-package com.city.datadelivery.base;
+package com.citi.datadelivery.base;
 
 public final class Message {
 

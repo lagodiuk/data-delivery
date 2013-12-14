@@ -1,10 +1,10 @@
-package com.city.datadelivery;
+package com.citi.datadelivery;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.city.datadelivery.base.Message;
-import com.city.datadelivery.base.MessageBuilder;
-import com.city.datadelivery.base.consumer.MessageConsumer;
+import com.citi.datadelivery.base.Message;
+import com.citi.datadelivery.base.MessageBuilder;
+import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 public class GreaterAgeConsumer implements MessageConsumer {
 

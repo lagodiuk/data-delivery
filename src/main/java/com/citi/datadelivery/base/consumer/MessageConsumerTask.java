@@ -1,6 +1,6 @@
-package com.city.datadelivery.base.consumer;
+package com.citi.datadelivery.base.consumer;
 
-import com.city.datadelivery.base.Message;
+import com.citi.datadelivery.base.Message;
 
 public class MessageConsumerTask implements Runnable {
 

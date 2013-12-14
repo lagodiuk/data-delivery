@@ -1,10 +1,10 @@
-package com.city.datadelivery;
+package com.citi.datadelivery;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.city.datadelivery.base.Message;
-import com.city.datadelivery.base.consumer.MessageConsumer;
+import com.citi.datadelivery.base.Message;
+import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 public class AverageAgeConsumer implements MessageConsumer {
 

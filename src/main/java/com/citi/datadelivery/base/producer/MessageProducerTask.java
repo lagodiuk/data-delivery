@@ -1,7 +1,7 @@
-package com.city.datadelivery.base.producer;
+package com.citi.datadelivery.base.producer;
 
-import com.city.datadelivery.base.Message;
-import com.city.datadelivery.base.MessageQueue;
+import com.citi.datadelivery.base.Message;
+import com.citi.datadelivery.base.MessageQueue;
 
 public class MessageProducerTask implements Runnable {
 
