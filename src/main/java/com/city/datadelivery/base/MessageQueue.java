@@ -10,12 +10,22 @@ public class MessageQueue {
 		this.messageQueue.add(message);
 	}
 
-	public Message getMessage() {
-		try {
-			Message message = this.messageQueue.take();
-			return message;
-		} catch (InterruptedException e) {
-			throw new MessageQueueException("Interrupted while waiting for new messages");
+	public Message getMessage() throws InterruptedException {
+		Message message = this.messageQueue.take();
+		return message;
+	}
+
+	public void waitUntilQueueIsEmpty() throws InterruptedException {
+		synchronized (this) {
+			this.wait();
+		}
+	}
+
+	public void notifyWaitersIfQueueIsEmpty() {
+		if (this.messageQueue.isEmpty()) {
+			synchronized (this) {
+				this.notifyAll();
+			}
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package com.city.datadelivery;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.city.datadelivery.base.Message;
 import com.city.datadelivery.base.MessageBuilder;
 import com.city.datadelivery.base.consumer.MessageConsumer;
@@ -7,6 +9,8 @@ import com.city.datadelivery.base.consumer.MessageConsumer;
 public class GreaterAgeConsumer implements MessageConsumer {
 
 	private int ageThreshold;
+
+	private AtomicLong cnt = new AtomicLong(0);
 
 	public GreaterAgeConsumer(int ageThreshold) {
 		this.ageThreshold = ageThreshold;
@@ -33,6 +37,7 @@ public class GreaterAgeConsumer implements MessageConsumer {
 
 	public void processProducedMessage(Message message) {
 		// TODO
-		System.out.println(message.getId() + "\t" + message.getAge());
+		System.out.println("Matched by age: " + message);
+		System.out.println(cnt.incrementAndGet());
 	}
 }

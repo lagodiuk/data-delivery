@@ -3,6 +3,7 @@ package com.city.datadelivery.base;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.city.datadelivery.base.consumer.MessageConsumer;
 import com.city.datadelivery.base.consumer.MessageConsumerTask;
@@ -11,48 +12,84 @@ import com.city.datadelivery.base.producer.MessageProducerTask;
 
 public class DeliveryManager implements Runnable {
 
-	private List<MessageConsumer> messageConsumers = new LinkedList<MessageConsumer>();
+	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
+	private static final int TIME_UNIT_AMOUNT = 1;
 
-	private List<MessageProducer> messageProducers = new LinkedList<MessageProducer>();
+	private List<MessageConsumer> messageConsumers = new LinkedList<MessageConsumer>();
+	private ExecutorService consumersExecutor;
+
+	private ExecutorService producersExecutor;
 
 	private MessageQueue messageQueue;
 
-	private ExecutorService executorService;
+	public DeliveryManager(
+			MessageQueue messageQueue,
+			ExecutorService producersExecutor,
+			ExecutorService consumersExecutor) {
 
-	public DeliveryManager(MessageQueue messageQueue, ExecutorService executorService) {
 		this.messageQueue = messageQueue;
-		this.executorService = executorService;
+		this.producersExecutor = producersExecutor;
+		this.consumersExecutor = consumersExecutor;
 	}
 
-	public void addMessageConsumer(MessageConsumer messageProcessor) {
-		this.messageConsumers.add(messageProcessor);
-	}
+	public void performDelivery() throws InterruptedException {
+		// Start messages dispatching process
+		Thread deliveryThread = new Thread(this);
+		deliveryThread.start();
 
-	public void addMessageProducer(MessageProducer messageProducer) {
-		this.messageProducers.add(messageProducer);
-	}
+		this.waitUntillAllProducersAreStopped();
 
-	public void start() {
-		// Fork all producers
-		for (MessageProducer messageProducer : this.messageProducers) {
-			MessageProducerTask task = new MessageProducerTask(this.messageQueue, messageProducer);
-			this.executorService.submit(task);
-		}
+		this.messageQueue.waitUntilQueueIsEmpty();
+		// Stop messages dispatching process
+		deliveryThread.interrupt();
 
-		// Start process for dispatching produced messages to consumers
-		this.executorService.submit(this);
+		this.waitUntilAllConsumersAreStopped();
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-			Message message = this.messageQueue.getMessage();
-			for (MessageConsumer consumer : this.messageConsumers) {
-				// Fork consuming process
-				// (message is immutable)
-				MessageConsumerTask task = new MessageConsumerTask(message, consumer);
-				this.executorService.submit(task);
+
+			Message message = null;
+			try {
+				message = this.messageQueue.getMessage();
+			} catch (InterruptedException e) {
+				break;
 			}
+
+			this.forkAllConsumers(message);
+
+			this.messageQueue.notifyWaitersIfQueueIsEmpty();
 		}
+	}
+
+	public void forkProducers(MessageProducer... messageProducers) {
+		for (MessageProducer messageProducer : messageProducers) {
+			MessageProducerTask task = new MessageProducerTask(this.messageQueue, messageProducer);
+			this.producersExecutor.submit(task);
+		}
+	}
+
+	public synchronized void addConsumers(MessageConsumer... messageConsumers) {
+		for (MessageConsumer messageConsumer : messageConsumers) {
+			this.messageConsumers.add(messageConsumer);
+		}
+	}
+
+	private synchronized void forkAllConsumers(Message message) {
+		for (MessageConsumer consumer : this.messageConsumers) {
+			MessageConsumerTask task = new MessageConsumerTask(message, consumer);
+			this.consumersExecutor.submit(task);
+		}
+	}
+
+	private void waitUntilAllConsumersAreStopped() throws InterruptedException {
+		this.consumersExecutor.shutdown();
+		this.consumersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
+	}
+
+	private void waitUntillAllProducersAreStopped() throws InterruptedException {
+		this.producersExecutor.shutdown();
+		this.producersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
 	}
 }

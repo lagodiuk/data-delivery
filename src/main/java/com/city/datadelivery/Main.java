@@ -1,6 +1,5 @@
 package com.city.datadelivery;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.city.datadelivery.base.DeliveryManager;
@@ -8,20 +7,26 @@ import com.city.datadelivery.base.MessageQueue;
 
 public class Main {
 
+	private static final int NUMBER_OF_PRODUCERS = 10;
+	private static final int NUMBER_OF_CONSUMERS = 10;
+
 	public static void main(String[] args) throws Exception {
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		MessageQueue messageQueue = new MessageQueue();
+		DeliveryManager deliveryManager =
+				new DeliveryManager(
+						new MessageQueue(),
+						Executors.newFixedThreadPool(NUMBER_OF_PRODUCERS),
+						Executors.newFixedThreadPool(NUMBER_OF_CONSUMERS));
 
-		DeliveryManager deliveryManager = new DeliveryManager(messageQueue, executorService);
+		deliveryManager.addConsumers(
+				new CityMatchingConsumer("City of Coil"),
+				new GreaterAgeConsumer(50),
+				new AverageAgeConsumer());
 
-		deliveryManager.addMessageConsumer(new CityMatchingConsumer("City of Coil"));
-		deliveryManager.addMessageConsumer(new GreaterAgeConsumer(50));
-		deliveryManager.addMessageConsumer(new AverageAgeConsumer());
+		deliveryManager.forkProducers(
+				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-0.csv"),
+				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-50000.csv"),
+				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-100000.csv"));
 
-		deliveryManager.addMessageProducer(new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-0.csv"));
-		deliveryManager.addMessageProducer(new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-50000.csv"));
-		deliveryManager.addMessageProducer(new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-100000.csv"));
-
-		deliveryManager.start();
+		deliveryManager.performDelivery();
 	}
 }

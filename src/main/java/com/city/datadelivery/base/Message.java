@@ -46,4 +46,10 @@ public final class Message {
 	public String getPostalCode() {
 		return this.postalCode;
 	}
+
+	@Override
+	public String toString() {
+		return "Message [id=" + this.id + ", name=" + this.name + ", age=" + this.age + ", address=" + this.address + ", city=" + this.city + ", postalCode=" + this.postalCode
+				+ "]";
+	}
 }

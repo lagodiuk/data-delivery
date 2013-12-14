@@ -50,5 +50,6 @@ public class CityMatchingConsumer implements MessageConsumer {
 
 	public void processProducedMessage(Message message) {
 		// TODO
+		System.out.println("Matched by city: " + message);
 	}
 }
