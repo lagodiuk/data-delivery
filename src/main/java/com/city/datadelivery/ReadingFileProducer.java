@@ -18,8 +18,6 @@ public class ReadingFileProducer implements MessageProducer {
 
 	private static final String DELIMITER_REGEXP = "\\|";
 
-	private volatile boolean isFinished = false;
-
 	private String fileName;
 
 	private BufferedReader reader;
@@ -56,8 +54,6 @@ public class ReadingFileProducer implements MessageProducer {
 			LOGGER.log(
 					Level.WARNING,
 					"Error while closing file " + this.fileName);
-		} finally {
-			this.isFinished = true;
 		}
 	}
 
@@ -73,10 +69,5 @@ public class ReadingFileProducer implements MessageProducer {
 						.withPostalCode(parts[5]);
 
 		return messageBuilder.createMessage();
-	}
-
-	@Override
-	public boolean isFinished() {
-		return this.isFinished;
 	}
 }

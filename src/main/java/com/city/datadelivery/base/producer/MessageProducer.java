@@ -9,6 +9,4 @@ public interface MessageProducer {
 	Message nextMessage();
 
 	void cleanUp();
-
-	boolean isFinished();
 }
