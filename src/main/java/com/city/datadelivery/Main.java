@@ -7,8 +7,8 @@ import com.city.datadelivery.base.MessageQueue;
 
 public class Main {
 
-	private static final int NUMBER_OF_PRODUCERS = 10;
-	private static final int NUMBER_OF_CONSUMERS = 10;
+	private static final int PRODUCER_THREADS_NUM = 10;
+	private static final int CONSUMER_THREADS_NUM = 10;
 
 	public static void main(String[] args) throws Exception {
 		MessageQueue messageQueue = new MessageQueue();
@@ -16,8 +16,8 @@ public class Main {
 		DeliveryManager deliveryManager =
 				new DeliveryManager(
 						messageQueue,
-						Executors.newFixedThreadPool(NUMBER_OF_PRODUCERS),
-						Executors.newFixedThreadPool(NUMBER_OF_CONSUMERS));
+						Executors.newFixedThreadPool(PRODUCER_THREADS_NUM),
+						Executors.newFixedThreadPool(CONSUMER_THREADS_NUM));
 
 		deliveryManager.addConsumers(
 				new CityMatchingConsumer("City of Coil"),
