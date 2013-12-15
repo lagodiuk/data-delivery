@@ -40,7 +40,6 @@ public class Main {
 
 		deliveryManager.waitUntillAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();
-		deliveryManager.interruptDeliveryThread();
 		deliveryManager.waitUntilAllConsumersAreStopped();
 
 		inputStream1.close();

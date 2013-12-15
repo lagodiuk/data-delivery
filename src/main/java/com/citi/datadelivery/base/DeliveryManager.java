@@ -36,17 +36,13 @@ public class DeliveryManager implements Runnable {
 
 	public void forkDeliveryThread() throws InterruptedException {
 		this.deliveryThread = new Thread(this);
+		this.deliveryThread.setDaemon(true);
 		this.deliveryThread.start();
-	}
-
-	public void interruptDeliveryThread() {
-		this.deliveryThread.interrupt();
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-
 			Message message = null;
 			try {
 				message = this.messageQueue.getMessage();
