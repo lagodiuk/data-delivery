@@ -7,6 +7,4 @@ public interface MessageProducer {
 	boolean hasMoreMessages();
 
 	Message nextMessage();
-
-	void cleanUp();
 }

@@ -2,8 +2,9 @@ package com.citi.datadelivery;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,15 +19,12 @@ public class ReadingFileProducer implements MessageProducer {
 
 	private static final String DELIMITER_REGEXP = "\\|";
 
-	private String fileName;
-
 	private BufferedReader reader;
 
 	private String nextLine;
 
-	public ReadingFileProducer(String fileName) throws FileNotFoundException {
-		this.reader = new BufferedReader(new FileReader(fileName));
-		this.fileName = fileName;
+	public ReadingFileProducer(InputStream in) throws FileNotFoundException {
+		this.reader = new BufferedReader(new InputStreamReader(in));
 	}
 
 	@Override
@@ -34,7 +32,7 @@ public class ReadingFileProducer implements MessageProducer {
 		try {
 			this.nextLine = this.reader.readLine();
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Error while reading file " + this.fileName);
+			LOGGER.log(Level.WARNING, "Error while reading input data");
 			return false;
 		}
 		return this.nextLine != null;
@@ -44,17 +42,6 @@ public class ReadingFileProducer implements MessageProducer {
 	public Message nextMessage() {
 		Message message = this.parse(this.nextLine);
 		return message;
-	}
-
-	@Override
-	public void cleanUp() {
-		try {
-			this.reader.close();
-		} catch (IOException e) {
-			LOGGER.log(
-					Level.WARNING,
-					"Error while closing file " + this.fileName);
-		}
 	}
 
 	private Message parse(String s) {

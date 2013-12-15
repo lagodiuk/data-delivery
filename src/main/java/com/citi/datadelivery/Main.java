@@ -1,5 +1,7 @@
 package com.citi.datadelivery;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.concurrent.Executors;
 
 import com.citi.datadelivery.base.DeliveryManager;
@@ -24,10 +26,13 @@ public class Main {
 				new GreaterAgeConsumer(50),
 				new AverageAgeConsumer());
 
+		InputStream inputStream1 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-0.csv");
+		InputStream inputStream2 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-50000.csv");
+		InputStream inputStream3 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-100000.csv");
 		deliveryManager.forkProducers(
-				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-0.csv"),
-				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-50000.csv"),
-				new ReadingFileProducer("/Users/yura/sandbox/city_bank/sampleData/input-100000.csv"));
+				new ReadingFileProducer(inputStream1),
+				new ReadingFileProducer(inputStream2),
+				new ReadingFileProducer(inputStream3));
 
 		deliveryManager.forkDeliveryThread();
 
@@ -37,5 +42,9 @@ public class Main {
 		deliveryManager.waitUntilQueueIsEmpty();
 		deliveryManager.interruptDeliveryThread();
 		deliveryManager.waitUntilAllConsumersAreStopped();
+
+		inputStream1.close();
+		inputStream2.close();
+		inputStream3.close();
 	}
 }
