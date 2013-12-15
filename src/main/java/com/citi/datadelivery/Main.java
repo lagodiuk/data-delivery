@@ -22,7 +22,7 @@ public class Main {
 						Executors.newFixedThreadPool(CONSUMER_THREADS_NUM));
 
 		deliveryManager.addConsumers(
-				new CityMatchingConsumer("City of Coil"),
+				new CityMatchingConsumer("Coil"),
 				new GreaterAgeConsumer(50),
 				new AverageAgeConsumer());
 

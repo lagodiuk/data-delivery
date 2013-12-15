@@ -1,7 +1,6 @@
 package com.citi.datadelivery;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +22,7 @@ public class InputStreamMessageProducer implements MessageProducer {
 
 	private String nextLine;
 
-	public InputStreamMessageProducer(InputStream in) throws FileNotFoundException {
+	public InputStreamMessageProducer(InputStream in) {
 		this.reader = new BufferedReader(new InputStreamReader(in));
 	}
 
@@ -44,7 +43,7 @@ public class InputStreamMessageProducer implements MessageProducer {
 		return message;
 	}
 
-	private Message parse(String s) {
+	Message parse(String s) {
 		String[] parts = s.split(DELIMITER_REGEXP);
 
 		MessageBuilder messageBuilder =
