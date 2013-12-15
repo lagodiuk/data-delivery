@@ -12,10 +12,10 @@ import com.citi.datadelivery.base.Message;
 import com.citi.datadelivery.base.MessageBuilder;
 import com.citi.datadelivery.base.producer.MessageProducer;
 
-public class ReadingFileProducer implements MessageProducer {
+public class InputStreamMessageProducer implements MessageProducer {
 
 	private static final Logger LOGGER =
-			Logger.getLogger(ReadingFileProducer.class.getName());
+			Logger.getLogger(InputStreamMessageProducer.class.getName());
 
 	private static final String DELIMITER_REGEXP = "\\|";
 
@@ -23,7 +23,7 @@ public class ReadingFileProducer implements MessageProducer {
 
 	private String nextLine;
 
-	public ReadingFileProducer(InputStream in) throws FileNotFoundException {
+	public InputStreamMessageProducer(InputStream in) throws FileNotFoundException {
 		this.reader = new BufferedReader(new InputStreamReader(in));
 	}
 

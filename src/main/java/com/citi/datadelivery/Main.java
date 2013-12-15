@@ -30,9 +30,9 @@ public class Main {
 		InputStream inputStream2 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-50000.csv");
 		InputStream inputStream3 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-100000.csv");
 		deliveryManager.forkProducers(
-				new ReadingFileProducer(inputStream1),
-				new ReadingFileProducer(inputStream2),
-				new ReadingFileProducer(inputStream3));
+				new InputStreamMessageProducer(inputStream1),
+				new InputStreamMessageProducer(inputStream2),
+				new InputStreamMessageProducer(inputStream3));
 
 		deliveryManager.forkDeliveryThread();
 
