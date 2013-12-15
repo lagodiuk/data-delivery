@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.citi.datadelivery.base.Message;
-import com.citi.datadelivery.base.MessageBuilder;
+import com.citi.datadelivery.base.MessageConverter;
 import com.citi.datadelivery.base.producer.MessageProducer;
 
 public class InputStreamMessageProducer implements MessageProducer {
@@ -16,14 +16,19 @@ public class InputStreamMessageProducer implements MessageProducer {
 	private static final Logger LOGGER =
 			Logger.getLogger(InputStreamMessageProducer.class.getName());
 
-	private static final String DELIMITER_REGEXP = "\\|";
+	private MessageConverter messageConverter;
 
 	private BufferedReader reader;
 
 	private String nextLine;
 
 	public InputStreamMessageProducer(InputStream in) {
+		this(in, new MessageConverterImpl());
+	}
+
+	public InputStreamMessageProducer(InputStream in, MessageConverter messageConverter) {
 		this.reader = new BufferedReader(new InputStreamReader(in));
+		this.messageConverter = messageConverter;
 	}
 
 	@Override
@@ -39,21 +44,7 @@ public class InputStreamMessageProducer implements MessageProducer {
 
 	@Override
 	public Message nextMessage() {
-		Message message = this.parse(this.nextLine);
+		Message message = this.messageConverter.stringToMessage(this.nextLine);
 		return message;
-	}
-
-	Message parse(String s) {
-		String[] parts = s.split(DELIMITER_REGEXP);
-
-		MessageBuilder messageBuilder =
-				new MessageBuilder(parts[0])
-						.withName(parts[1])
-						.withAge(parts[2])
-						.withAddress(parts[3])
-						.withCity(parts[4])
-						.withPostalCode(parts[5]);
-
-		return messageBuilder.createMessage();
 	}
 }

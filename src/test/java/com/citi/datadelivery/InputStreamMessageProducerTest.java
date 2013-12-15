@@ -14,7 +14,7 @@ public class InputStreamMessageProducerTest {
 
 	@Test
 	public void testMessageProducing() {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(this.inputString.getBytes());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(this.testMessages.getBytes());
 		InputStreamMessageProducer producer = new InputStreamMessageProducer(inputStream);
 
 		Set<Message> producedMessages = new HashSet<Message>();
@@ -36,7 +36,7 @@ public class InputStreamMessageProducerTest {
 				producedMessages.contains(this.expectedMessage3));
 	}
 
-	private String inputString =
+	private String testMessages =
 			String.format("1|Lastname_1, Firstname_1|10|Sample address 1|Sample city 1|111-111%n" +
 					"2|Lastname_2, Firstname_2|20|Sample address 2|Sample city 2|222-222%n" +
 					"3|Lastname_3, Firstname_3|30|Sample address 3|Sample city 3|333-333%n");
