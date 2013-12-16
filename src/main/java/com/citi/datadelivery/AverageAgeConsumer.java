@@ -8,7 +8,7 @@ import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 public class AverageAgeConsumer implements MessageConsumer {
 
-	private Lock lockObj = new ReentrantLock();
+	private final Lock lockObj = new ReentrantLock();
 
 	private double averageAge = 0;
 
@@ -38,6 +38,57 @@ public class AverageAgeConsumer implements MessageConsumer {
 			return this.averageAge;
 		} finally {
 			this.lockObj.unlock();
+		}
+	}
+
+	public Result getResult() {
+		try {
+			this.lockObj.lock();
+			return new Result(this.averageAge, this.processedMessagesCount);
+		} finally {
+			this.lockObj.unlock();
+		}
+	}
+
+	public static class Result {
+		public final double averageAge;
+		public final int processedMessagesCount;
+
+		public Result(double averageAge, int processedMessagesCount) {
+			this.averageAge = averageAge;
+			this.processedMessagesCount = processedMessagesCount;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			long temp;
+			temp = Double.doubleToLongBits(this.averageAge);
+			result = (prime * result) + (int) (temp ^ (temp >>> 32));
+			result = (prime * result) + this.processedMessagesCount;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (this.getClass() != obj.getClass()) {
+				return false;
+			}
+			Result other = (Result) obj;
+			if (Double.doubleToLongBits(this.averageAge) != Double.doubleToLongBits(other.averageAge)) {
+				return false;
+			}
+			if (this.processedMessagesCount != other.processedMessagesCount) {
+				return false;
+			}
+			return true;
 		}
 	}
 }

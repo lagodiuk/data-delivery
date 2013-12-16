@@ -3,8 +3,13 @@ package com.citi.datadelivery.cucumber;
 import gherkin.formatter.model.DataTableRow;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
+
+import org.junit.Assert;
 
 import com.citi.datadelivery.GreaterAgeConsumer;
 import com.citi.datadelivery.InputStreamMessageProducer;
@@ -41,8 +46,9 @@ public class MessagesIntegrationTest {
 						Executors.newFixedThreadPool(5),
 						Executors.newFixedThreadPool(5));
 
+		ByteArrayOutputStream consumerOutputStream = new ByteArrayOutputStream();
 		deliveryManager.addConsumers(
-				new GreaterAgeConsumer(50));
+				new GreaterAgeConsumer(50, consumerOutputStream));
 
 		deliveryManager.forkProducers(
 				new InputStreamMessageProducer(
@@ -54,12 +60,26 @@ public class MessagesIntegrationTest {
 		deliveryManager.waitUntillAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();
 		deliveryManager.waitUntilAllConsumersAreStopped();
+
+		this.actualOutputData = new String(consumerOutputStream.toByteArray());
 	}
 
 	@Then("^following filtered rows are expected$")
 	public void following_filtered_rows_are_expected(DataTable table) throws Throwable {
-		String expectedOutput = this.tableToString(table);
-		// TODO
+		String expectedOutputData = this.tableToString(table);
+		Set<String> expectedRows = this.splitByLines(expectedOutputData);
+
+		Set<String> actualRows = this.splitByLines(this.actualOutputData);
+
+		Assert.assertEquals(expectedRows, actualRows);
+	}
+
+	private Set<String> splitByLines(String expectedOutput) {
+		Set<String> expectedRows = new HashSet<String>();
+		for (String row : expectedOutput.split(NEW_LINE)) {
+			expectedRows.add(row);
+		}
+		return expectedRows;
 	}
 
 	private String tableToString(DataTable table) {

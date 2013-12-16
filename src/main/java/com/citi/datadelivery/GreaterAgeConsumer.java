@@ -1,19 +1,32 @@
 package com.citi.datadelivery;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.citi.datadelivery.base.Message;
-import com.citi.datadelivery.base.MessageBuilder;
+import com.citi.datadelivery.base.MessageConverter;
 import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 public class GreaterAgeConsumer implements MessageConsumer {
 
-	private int ageThreshold;
+	private final int ageThreshold;
 
-	private AtomicLong cnt = new AtomicLong(0);
+	private final PrintWriter writer;
 
-	public GreaterAgeConsumer(int ageThreshold) {
+	private final MessageConverter messageConverter;
+
+	private final Lock writerLock = new ReentrantLock();
+
+	public GreaterAgeConsumer(int ageThreshold, OutputStream out) {
+		this(ageThreshold, out, new MessageConverterImpl());
+	}
+
+	public GreaterAgeConsumer(int ageThreshold, OutputStream out, MessageConverter messageConverter) {
 		this.ageThreshold = ageThreshold;
+		this.writer = new PrintWriter(out, true);
+		this.messageConverter = messageConverter;
 	}
 
 	@Override
@@ -22,22 +35,16 @@ public class GreaterAgeConsumer implements MessageConsumer {
 		if ((age == null) || (age < this.ageThreshold)) {
 			return;
 		}
-
-		Message producedMessage =
-				new MessageBuilder(message.getId())
-						.withName(message.getName())
-						.withPostalCode(message.getPostalCode())
-						.withCity(message.getCity())
-						.withAddress(message.getAddress())
-						.withAge(age)
-						.createMessage();
-
-		this.processProducedMessage(producedMessage);
+		this.processProducedMessage(message);
 	}
 
 	public void processProducedMessage(Message message) {
-		// TODO
-		System.out.println("Matched by age: " + message);
-		System.out.println(cnt.incrementAndGet());
+		try {
+			this.writerLock.lock();
+			String messageStr = this.messageConverter.messageToString(message);
+			this.writer.println(messageStr);
+		} finally {
+			this.writerLock.unlock();
+		}
 	}
 }

@@ -22,8 +22,8 @@ public class Main {
 						Executors.newFixedThreadPool(CONSUMER_THREADS_NUM));
 
 		deliveryManager.addConsumers(
-				new CityMatchingConsumer("Coil"),
-				new GreaterAgeConsumer(50),
+				new CityMatchingConsumer("Coil", System.out),
+				new GreaterAgeConsumer(50, System.out),
 				new AverageAgeConsumer());
 
 		InputStream inputStream1 = new FileInputStream("/Users/yura/sandbox/city_bank/sampleData/input-0.csv");
