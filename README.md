@@ -1,5 +1,8 @@
 data-delivery
 =============
+
+![Scheme](https://raw.github.com/lagodiuk/data-delivery/master/description.png)
+
 1) Implement message producing logic:
 
 ```java
