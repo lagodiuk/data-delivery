@@ -88,7 +88,7 @@ public class DeliveryManager implements Runnable {
 		this.consumersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
 	}
 
-	public void waitUntillAllProducersAreStopped() throws InterruptedException {
+	public void waitUntilAllProducersAreStopped() throws InterruptedException {
 		this.producersExecutor.shutdown();
 		this.producersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
 	}

@@ -111,7 +111,7 @@ public class MessagesIntegrationTest {
 						new ByteArrayInputStream(
 								this.inputData.getBytes())));
 
-		deliveryManager.waitUntillAllProducersAreStopped();
+		deliveryManager.waitUntilAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();
 		deliveryManager.waitUntilAllConsumersAreStopped();
 	}
