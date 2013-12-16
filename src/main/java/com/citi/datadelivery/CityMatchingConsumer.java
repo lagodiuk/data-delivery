@@ -58,7 +58,7 @@ public class CityMatchingConsumer implements MessageConsumer {
 	 * "Lastname, Firstname" -> "Firstname Lastname"
 	 */
 	String transformName(String name) {
-		if (name.matches("^(.+),(.+)$")) {
+		if ((name != null) && name.matches("^([^,]+),([^,]+)$")) {
 			String[] parts = name.split(",");
 			String lastName = parts[0].trim();
 			String firstName = parts[1].trim();
