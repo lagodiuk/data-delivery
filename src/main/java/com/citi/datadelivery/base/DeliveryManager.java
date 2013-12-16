@@ -3,6 +3,7 @@ package com.citi.datadelivery.base;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.citi.datadelivery.base.consumer.MessageConsumer;
@@ -13,25 +14,27 @@ import com.citi.datadelivery.base.producer.MessageProducerTask;
 public class DeliveryManager implements Runnable {
 
 	private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
+
 	private static final int TIME_UNIT_AMOUNT = 1;
 
-	private List<MessageConsumer> messageConsumers = new LinkedList<MessageConsumer>();
-	private ExecutorService consumersExecutor;
+	private final List<MessageConsumer> messageConsumers = new LinkedList<MessageConsumer>();
 
-	private ExecutorService producersExecutor;
+	private final MessageQueue messageQueue;
 
-	private MessageQueue messageQueue;
+	private final ExecutorService consumersExecutor;
+
+	private final ExecutorService producersExecutor;
 
 	private Thread deliveryThread;
 
 	public DeliveryManager(
-			MessageQueue messageQueue,
-			ExecutorService producersExecutor,
-			ExecutorService consumersExecutor) {
+			int expectedNumberOfProducers,
+			int expectedNumberOfConsumers,
+			int messageQueueCapacity) {
 
-		this.messageQueue = messageQueue;
-		this.producersExecutor = producersExecutor;
-		this.consumersExecutor = consumersExecutor;
+		this.producersExecutor = Executors.newFixedThreadPool(expectedNumberOfProducers);
+		this.consumersExecutor = Executors.newFixedThreadPool(expectedNumberOfConsumers);
+		this.messageQueue = new MessageQueue(messageQueueCapacity);
 	}
 
 	public void forkDeliveryThread() throws InterruptedException {
@@ -50,10 +53,14 @@ public class DeliveryManager implements Runnable {
 				break;
 			}
 
-			this.forkAllConsumers(message);
+			if (message == Message.POISON_PILL) {
+				break;
+			}
 
-			this.notifyWaitersIfQueueIsEmpty();
+			this.forkAllConsumers(message);
 		}
+
+		this.notifyThatQueueIsEmpty();
 	}
 
 	public void forkProducers(MessageProducer... messageProducers) {
@@ -86,17 +93,12 @@ public class DeliveryManager implements Runnable {
 		this.producersExecutor.awaitTermination(TIME_UNIT_AMOUNT, TIME_UNIT);
 	}
 
-	public void waitUntilQueueIsEmpty() throws InterruptedException {
-		synchronized (this) {
-			this.wait();
-		}
+	public synchronized void waitUntilQueueIsEmpty() throws InterruptedException {
+		this.messageQueue.addMessage(Message.POISON_PILL);
+		this.wait();
 	}
 
-	private void notifyWaitersIfQueueIsEmpty() {
-		if (this.messageQueue.isEmpty()) {
-			synchronized (this) {
-				this.notifyAll();
-			}
-		}
+	private synchronized void notifyThatQueueIsEmpty() {
+		this.notifyAll();
 	}
 }

@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import org.junit.Assert;
 
@@ -16,7 +15,6 @@ import com.citi.datadelivery.CityMatchingConsumer;
 import com.citi.datadelivery.GreaterAgeConsumer;
 import com.citi.datadelivery.InputStreamMessageProducer;
 import com.citi.datadelivery.base.DeliveryManager;
-import com.citi.datadelivery.base.MessageQueue;
 import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 import cucumber.api.DataTable;
@@ -25,6 +23,12 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class MessagesIntegrationTest {
+
+	private static final int PRODUCER_THREADS_NUM = 10;
+
+	private static final int CONSUMER_THREADS_NUM = 10;
+
+	private static final int MESSAGE_QUEUE_CAPACITY = 30;
 
 	private static final String NEW_LINE = String.format("%n");
 
@@ -92,22 +96,20 @@ public class MessagesIntegrationTest {
 	}
 
 	private void launchForConsumer(MessageConsumer consumer) throws InterruptedException {
-		MessageQueue messageQueue = new MessageQueue();
-
 		DeliveryManager deliveryManager =
 				new DeliveryManager(
-						messageQueue,
-						Executors.newFixedThreadPool(5),
-						Executors.newFixedThreadPool(5));
+						PRODUCER_THREADS_NUM,
+						CONSUMER_THREADS_NUM,
+						MESSAGE_QUEUE_CAPACITY);
 
 		deliveryManager.addConsumers(consumer);
+
+		deliveryManager.forkDeliveryThread();
 
 		deliveryManager.forkProducers(
 				new InputStreamMessageProducer(
 						new ByteArrayInputStream(
 								this.inputData.getBytes())));
-
-		deliveryManager.forkDeliveryThread();
 
 		deliveryManager.waitUntillAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();

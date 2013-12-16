@@ -2,6 +2,9 @@ package com.citi.datadelivery.base;
 
 public final class Message {
 
+	public static final Message POISON_PILL =
+			new Message(null, null, null, null, null, null);
+
 	private final String id;
 
 	private final String name;
