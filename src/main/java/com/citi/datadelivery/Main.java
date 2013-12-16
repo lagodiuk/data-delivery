@@ -45,7 +45,10 @@ public class Main {
 		System.out.println("Message delivery started");
 
 		deliveryManager.waitUntilAllProducersAreStopped();
+
+		// This method will send 'poison pill message' to stop delivery thread
 		deliveryManager.waitUntilQueueIsEmpty();
+
 		deliveryManager.waitUntilAllConsumersAreStopped();
 
 		inputStream1.close();
