@@ -1,4 +1,4 @@
-package com.citi.datadelivery;
+package com.citi.datadelivery.cucumber;
 
 import org.junit.runner.RunWith;
 
@@ -7,5 +7,5 @@ import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(format = "pretty")
-public class IntegrationTestRunner {
+public class CucumberTestRunner {
 }
