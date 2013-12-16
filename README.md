@@ -65,7 +65,7 @@ public class Main {
 
 		System.out.println("Message delivery started");
 
-		deliveryManager.waitUntillAllProducersAreStopped();
+		deliveryManager.waitUntilAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();
 		deliveryManager.waitUntilAllConsumersAreStopped();
 
