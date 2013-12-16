@@ -11,10 +11,13 @@ import java.util.concurrent.Executors;
 
 import org.junit.Assert;
 
+import com.citi.datadelivery.AverageAgeConsumer;
+import com.citi.datadelivery.CityMatchingConsumer;
 import com.citi.datadelivery.GreaterAgeConsumer;
 import com.citi.datadelivery.InputStreamMessageProducer;
 import com.citi.datadelivery.base.DeliveryManager;
 import com.citi.datadelivery.base.MessageQueue;
+import com.citi.datadelivery.base.consumer.MessageConsumer;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
@@ -31,6 +34,8 @@ public class MessagesIntegrationTest {
 
 	private String actualOutputData;
 
+	private AverageAgeConsumer.Result actualAverageAge;
+
 	@Given("^following input rows$")
 	public void following_rows(DataTable table) throws Throwable {
 		this.inputData = this.tableToString(table);
@@ -38,6 +43,55 @@ public class MessagesIntegrationTest {
 
 	@When("^filtering messages by age of (\\d+)$")
 	public void filtering_messages_by_age_of(int age) throws Throwable {
+
+		ByteArrayOutputStream consumerOutputStream = new ByteArrayOutputStream();
+
+		GreaterAgeConsumer greaterAgeConsumer = new GreaterAgeConsumer(50, consumerOutputStream);
+
+		this.launchForConsumer(greaterAgeConsumer);
+
+		this.actualOutputData = new String(consumerOutputStream.toByteArray());
+	}
+
+	@When("^filtering messages by city of \"([^\"]*)\"$")
+	public void filtering_messages_by_city_of(String arg1) throws Throwable {
+
+		ByteArrayOutputStream consumerOutputStream = new ByteArrayOutputStream();
+
+		CityMatchingConsumer cityMatchingConsumer = new CityMatchingConsumer("Coil", consumerOutputStream);
+
+		this.launchForConsumer(cityMatchingConsumer);
+
+		this.actualOutputData = new String(consumerOutputStream.toByteArray());
+	}
+
+	@When("^calculating average age$")
+	public void calculating_average_age() throws Throwable {
+
+		AverageAgeConsumer averageAgeConsumer = new AverageAgeConsumer();
+
+		this.launchForConsumer(averageAgeConsumer);
+
+		this.actualAverageAge = averageAgeConsumer.getResult();
+	}
+
+	@Then("^following filtered rows are expected$")
+	public void following_filtered_rows_are_expected(DataTable table) throws Throwable {
+
+		Set<String> expectedRows = this.splitByLines(this.tableToString(table));
+
+		Set<String> actualRows = this.splitByLines(this.actualOutputData);
+
+		Assert.assertEquals(expectedRows, actualRows);
+	}
+
+	@Then("^average age must be (\\d+\\.\\d+) and number of processed messages must be (\\d+)$")
+	public void average_age_must_be_and_number_of_processed_messages_must_be(double expectedAverageAge, int expectedCount) throws Throwable {
+		Assert.assertEquals(expectedAverageAge, this.actualAverageAge.averageAge, 1e-5);
+		Assert.assertEquals(expectedCount, this.actualAverageAge.processedMessagesCount);
+	}
+
+	private void launchForConsumer(MessageConsumer consumer) throws InterruptedException {
 		MessageQueue messageQueue = new MessageQueue();
 
 		DeliveryManager deliveryManager =
@@ -46,9 +100,7 @@ public class MessagesIntegrationTest {
 						Executors.newFixedThreadPool(5),
 						Executors.newFixedThreadPool(5));
 
-		ByteArrayOutputStream consumerOutputStream = new ByteArrayOutputStream();
-		deliveryManager.addConsumers(
-				new GreaterAgeConsumer(50, consumerOutputStream));
+		deliveryManager.addConsumers(consumer);
 
 		deliveryManager.forkProducers(
 				new InputStreamMessageProducer(
@@ -60,18 +112,6 @@ public class MessagesIntegrationTest {
 		deliveryManager.waitUntillAllProducersAreStopped();
 		deliveryManager.waitUntilQueueIsEmpty();
 		deliveryManager.waitUntilAllConsumersAreStopped();
-
-		this.actualOutputData = new String(consumerOutputStream.toByteArray());
-	}
-
-	@Then("^following filtered rows are expected$")
-	public void following_filtered_rows_are_expected(DataTable table) throws Throwable {
-		String expectedOutputData = this.tableToString(table);
-		Set<String> expectedRows = this.splitByLines(expectedOutputData);
-
-		Set<String> actualRows = this.splitByLines(this.actualOutputData);
-
-		Assert.assertEquals(expectedRows, actualRows);
 	}
 
 	private Set<String> splitByLines(String expectedOutput) {
