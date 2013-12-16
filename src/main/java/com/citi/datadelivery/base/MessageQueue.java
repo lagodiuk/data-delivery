@@ -1,13 +1,23 @@
 package com.citi.datadelivery.base;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class MessageQueue {
 
-	private LinkedBlockingQueue<Message> messageQueue = new LinkedBlockingQueue<Message>();
+	private static final int DEFAULT_CAPACITY = 1024;
 
-	public void addMessage(Message message) {
-		this.messageQueue.add(message);
+	private final ArrayBlockingQueue<Message> messageQueue;
+
+	public MessageQueue() {
+		this(DEFAULT_CAPACITY);
+	}
+
+	public MessageQueue(int capacity) {
+		this.messageQueue = new ArrayBlockingQueue<Message>(capacity);
+	}
+
+	public void addMessage(Message message) throws InterruptedException {
+		this.messageQueue.put(message);
 	}
 
 	public Message getMessage() throws InterruptedException {

@@ -5,9 +5,9 @@ import com.citi.datadelivery.base.MessageQueue;
 
 public class MessageProducerTask implements Runnable {
 
-	private MessageQueue messageQueue;
+	private final MessageQueue messageQueue;
 
-	private MessageProducer messageProducer;
+	private final MessageProducer messageProducer;
 
 	public MessageProducerTask(MessageQueue messageQueue, MessageProducer messageProducer) {
 		this.messageQueue = messageQueue;
@@ -18,7 +18,11 @@ public class MessageProducerTask implements Runnable {
 	public void run() {
 		while (this.messageProducer.hasMoreMessages()) {
 			Message message = this.messageProducer.nextMessage();
-			this.messageQueue.addMessage(message);
+			try {
+				this.messageQueue.addMessage(message);
+			} catch (InterruptedException e) {
+				break;
+			}
 		}
 	}
 }
